@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.competition.system.mapper.SysCompetitionApplicationMapper">
+
+    <resultMap type="SysCompetitionApplication" id="SysCompetitionApplicationResult">
+        <result property="id" column="id"/>
+        <result property="competitionName" column="competition_name"/>
+        <result property="competitionDesc" column="competition_desc"/>
+        <result property="contestants" column="contestants"/>
+        <result property="introduction" column="introduction"/>
+        <result property="applyType" column="apply_type"/>
+        <result property="answer" column="answer"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="score" column="score"/>
+        <result property="enrollName" column="enroll_name"/>
+    </resultMap>
+
+    <sql id="selectSysCompetitionApplicationVo">
+        select id,
+               score,
+               competition_name,
+               competition_desc,
+               contestants,
+               introduction,
+               apply_type,
+               answer,
+               create_time,
+               create_by,
+               update_time,
+               update_by
+        from sys_competition_application
+    </sql>
+
+    <select id="selectSysCompetitionApplicationList" parameterType="SysCompetitionApplication"
+            resultMap="SysCompetitionApplicationResult">
+        select distinct
+            application.id,
+        application.score,
+        application.competition_name,
+        application.competition_desc,
+        application.contestants,
+        application.introduction,
+        application.apply_type,
+        application.answer,
+        application.create_time,
+        application.create_by,
+        application.update_time,
+        application.update_by,
+        enroll.enroll_name
+        from sys_competition_application application
+        join sys_competition_enroll enroll
+        on application.competition_name = enroll.competition_name
+
+
+        <where>
+            <if test="competitionName != null  and competitionName != ''">and competition_name like concat('%',
+                #{competitionName}, '%')
+            </if>
+            <if test="competitionDesc != null  and competitionDesc != ''">and competition_desc = #{competitionDesc}</if>
+            <if test="contestants != null  and contestants != ''">and contestants = #{contestants}</if>
+            <if test="introduction != null  and introduction != ''">and introduction = #{introduction}</if>
+            <if test="applyType != null  and applyType != ''">and apply_type = #{applyType}</if>
+            <if test="answer != null  and answer != ''">and answer = #{answer}</if>
+        </where>
+        order by score desc
+    </select>
+
+    <select id="selectSysCompetitionApplicationById" parameterType="Long" resultMap="SysCompetitionApplicationResult">
+        <include refid="selectSysCompetitionApplicationVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectListCompetition" resultMap="SysCompetitionApplicationResult" parameterType="String">
+        select id, competition_name
+        from sys_competition_apply
+        where check_status = '1'
+          and competition_type = #{type}
+          and del = '0'
+    </select>
+    <select id="listApplyResult" parameterType="SysCompetitionApplication"
+            resultMap="SysCompetitionApplicationResult">
+        SELECT
+            id,
+            CAST( score AS SIGNED ) AS score,
+            competition_name,
+            competition_desc,
+            contestants,
+            apply_type,
+            answer
+        FROM
+            sys_competition_application a
+        WHERE
+                score = ( SELECT max( CAST( score AS SIGNED )) FROM sys_competition_application WHERE competition_name = a.competition_name )
+        ORDER BY
+            a.competition_name,score
+    </select>
+    <select id="listCountApply" parameterType="SysCompetitionApplication"
+            resultMap="SysCompetitionApplicationResult">
+        select
+            apply.competition_name,
+               count(enroll.enroll_name) as contestants
+        FROM sys_competition_apply apply
+        join sys_competition_enroll  enroll
+        on apply.competition_name = enroll.competition_name
+        WHERE del = '1'
+        group by competition_name
+    </select>
+
+    <insert id="insertSysCompetitionApplication" parameterType="SysCompetitionApplication" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into sys_competition_application
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="competitionName != null">competition_name,</if>
+            <if test="competitionDesc != null">competition_desc,</if>
+            <if test="contestants != null">contestants,</if>
+            <if test="introduction != null">introduction,</if>
+            <if test="applyType != null">apply_type,</if>
+            <if test="answer != null">answer,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="updateBy != null">update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="competitionName != null">#{competitionName},</if>
+            <if test="competitionDesc != null">#{competitionDesc},</if>
+            <if test="contestants != null">#{contestants},</if>
+            <if test="introduction != null">#{introduction},</if>
+            <if test="applyType != null">#{applyType},</if>
+            <if test="answer != null">#{answer},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSysCompetitionApplication" parameterType="SysCompetitionApplication">
+        update sys_competition_application
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="competitionName != null">competition_name = #{competitionName},</if>
+            <if test="competitionDesc != null">competition_desc = #{competitionDesc},</if>
+            <if test="contestants != null">contestants = #{contestants},</if>
+            <if test="introduction != null">introduction = #{introduction},</if>
+            <if test="applyType != null">apply_type = #{applyType},</if>
+            <if test="answer != null">answer = #{answer},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="score != null">score = #{score},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysCompetitionApplicationById" parameterType="Long">
+        update sys_competition_application
+        set del = '1'
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteSysCompetitionApplicationByIds" parameterType="String">
+        delete from sys_competition_application where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

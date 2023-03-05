@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.competition.system.mapper.SysCompetitionQuestionMapper">
+    
+    <resultMap type="SysCompetitionQuestion" id="SysCompetitionQuestionResult">
+        <result property="id"    column="id"    />
+        <result property="competitionId"    column="competition_id"    />
+        <result property="questionName"    column="question_name"    />
+        <result property="score"    column="score"    />
+    </resultMap>
+
+    <sql id="selectSysCompetitionQuestionVo">
+        select id, competition_id, question_name, score from sys_competition_question
+    </sql>
+
+    <select id="selectSysCompetitionQuestionList" parameterType="SysCompetitionQuestion" resultMap="SysCompetitionQuestionResult">
+        <include refid="selectSysCompetitionQuestionVo"/>
+        <where>  
+            <if test="competitionId != null "> and competition_id = #{competitionId}</if>
+            <if test="questionName != null  and questionName != ''"> and question_name like concat('%', #{questionName}, '%')</if>
+            <if test="score != null  and score != ''"> and score = #{score}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysCompetitionQuestionById" parameterType="Long" resultMap="SysCompetitionQuestionResult">
+        <include refid="selectSysCompetitionQuestionVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSysCompetitionQuestion" parameterType="SysCompetitionQuestion" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_competition_question
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="competitionId != null">competition_id,</if>
+            <if test="questionName != null">question_name,</if>
+            <if test="score != null">score,</if>
+            <if test="questionType != null">question_type,</if>
+            <if test="questionAnswer != null">question_answer,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="competitionId != null">#{competitionId},</if>
+            <if test="questionName != null">#{questionName},</if>
+            <if test="score != null">#{score},</if>
+            <if test="questionType != null">#{questionType},</if>
+            <if test="questionAnswer != null">#{questionAnswer},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysCompetitionQuestion" parameterType="SysCompetitionQuestion">
+        update sys_competition_question
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="competitionId != null">competition_id = #{competitionId},</if>
+            <if test="questionName != null">question_name = #{questionName},</if>
+            <if test="score != null">score = #{score},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysCompetitionQuestionById" parameterType="Long">
+        delete from sys_competition_question where id = #{id}
+    </delete>
+
+    <delete id="deleteSysCompetitionQuestionByIds" parameterType="String">
+        delete from sys_competition_question where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

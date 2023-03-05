@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.competition.system.mapper.SysCompetitionEnrollMapper">
+    
+    <resultMap type="SysCompetitionEnroll" id="SysCompetitionEnrollResult">
+        <result property="id"    column="id"    />
+        <result property="enrollName"    column="enroll_name"    />
+        <result property="competitionName"    column="competition_name"    />
+        <result property="phoneNumber"    column="phone_number"    />
+        <result property="email"    column="email"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+    </resultMap>
+
+    <resultMap type="SysCompetitionApply" id="SysCompetitionApplyResult">
+        <result property="id"    column="id"    />
+        <result property="competitionName"    column="competition_name"    />
+        <result property="enrollEndTime"    column="enroll_end_time"    />
+        <result property="competitionTime"    column="competition_time"    />
+        <result property="personnelLimit"    column="personnel_limit"    />
+        <result property="competitionType"    column="competition_type"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="checkStatus"    column="check_status"    />
+    </resultMap>
+
+    <sql id="selectSysCompetitionEnrollVo">
+        select id, enroll_name, competition_name, phone_number, email, create_time, create_by, update_time, update_by from sys_competition_enroll
+    </sql>
+
+    <select id="selectSysCompetitionEnrollList" parameterType="SysCompetitionEnroll" resultMap="SysCompetitionEnrollResult">
+        <include refid="selectSysCompetitionEnrollVo"/>
+        <where>  
+            <if test="enrollName != null  and enrollName != ''"> and enroll_name like concat('%', #{enrollName}, '%')</if>
+            <if test="competitionName != null  and competitionName != ''"> and competition_name like concat('%', #{competitionName}, '%')</if>
+            <if test="phoneNumber != null  and phoneNumber != ''"> and phone_number = #{phoneNumber}</if>
+            <if test="email != null  and email != ''"> and email = #{email}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysCompetitionEnrollById" parameterType="Long" resultMap="SysCompetitionEnrollResult">
+        <include refid="selectSysCompetitionEnrollVo"/>
+        where id = #{id}
+    </select>
+    <select id="listCompetition" parameterType="SysCompetitionApply" resultMap="SysCompetitionApplyResult">
+        select id,competition_name from sys_competition_apply where check_status = '1' and del = '0'
+    </select>
+
+    <insert id="insertSysCompetitionEnroll" parameterType="SysCompetitionEnroll" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_competition_enroll
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="enrollName != null">enroll_name,</if>
+            <if test="competitionName != null">competition_name,</if>
+            <if test="phoneNumber != null">phone_number,</if>
+            <if test="email != null">email,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="updateBy != null">update_by,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="enrollName != null">#{enrollName},</if>
+            <if test="competitionName != null">#{competitionName},</if>
+            <if test="phoneNumber != null">#{phoneNumber},</if>
+            <if test="email != null">#{email},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysCompetitionEnroll" parameterType="SysCompetitionEnroll">
+        update sys_competition_enroll
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="enrollName != null">enroll_name = #{enrollName},</if>
+            <if test="competitionName != null">competition_name = #{competitionName},</if>
+            <if test="phoneNumber != null">phone_number = #{phoneNumber},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysCompetitionEnrollById" parameterType="Long">
+        delete from sys_competition_enroll where id = #{id}
+    </delete>
+
+    <delete id="deleteSysCompetitionEnrollByIds" parameterType="String">
+        delete from sys_competition_enroll where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

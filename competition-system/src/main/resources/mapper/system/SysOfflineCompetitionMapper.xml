@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.competition.system.mapper.SysOfflineCompetitionMapper">
+
+    <resultMap type="SysOfflineCompetition" id="SysOfflineCompetitionResult">
+        <result property="id" column="id"/>
+        <result property="competitionName" column="competition_name"/>
+        <result property="enrollEndTime" column="enroll_end_time"/>
+        <result property="competitionTime" column="competition_time"/>
+        <result property="personnelLimit" column="personnel_limit"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="checkStatus" column="check_status"/>
+    </resultMap>
+
+    <sql id="selectSysOfflineCompetitionVo">
+        select id,
+               competition_name,
+               check_status,
+               enroll_end_time,
+               competition_time,
+               personnel_limit,
+               competition_type,
+               create_time,
+               create_by,
+               update_time,
+               update_by
+        from sys_competition_apply
+    </sql>
+
+    <select id="selectSysOfflineCompetitionList" parameterType="SysOfflineCompetition"
+            resultMap="SysOfflineCompetitionResult">
+        <include refid="selectSysOfflineCompetitionVo"/>
+        <where>
+            <if test="competitionName != null  and competitionName != ''">and competition_name like concat('%',
+                #{competitionName}, '%')
+            </if>
+            <if test="enrollEndTime != null ">and enroll_end_time = #{enrollEndTime}</if>
+            <if test="competitionTime != null ">and competition_time = #{competitionTime}</if>
+            <if test="personnelLimit != null  and personnelLimit != ''">and personnel_limit = #{personnelLimit}</if>
+            and competition_type = '3'
+            and del = '0'
+        </where>
+    </select>
+
+    <select id="selectSysOfflineCompetitionById" parameterType="Long" resultMap="SysOfflineCompetitionResult">
+        <include refid="selectSysOfflineCompetitionVo"/>
+        where id = #{id}
+        and del ='0'
+    </select>
+
+    <insert id="insertSysOfflineCompetition" parameterType="SysOfflineCompetition" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into sys_competition_apply
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="competitionName != null">competition_name,</if>
+            <if test="enrollEndTime != null">enroll_end_time,</if>
+            <if test="competitionTime != null">competition_time,</if>
+            <if test="personnelLimit != null">personnel_limit,</if>
+            <if test="competitionType != null">competition_type,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="checkStatus != null">check_status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="competitionName != null">#{competitionName},</if>
+            <if test="enrollEndTime != null">#{enrollEndTime},</if>
+            <if test="competitionTime != null">#{competitionTime},</if>
+            <if test="personnelLimit != null">#{personnelLimit},</if>
+            <if test="competitionType != null">#{competitionType},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="checkStatus != null">#{checkStatus},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSysOfflineCompetition" parameterType="SysOfflineCompetition">
+        update sys_competition_apply
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="competitionName != null">competition_name = #{competitionName},</if>
+            <if test="enrollEndTime != null">enroll_end_time = #{enrollEndTime},</if>
+            <if test="competitionTime != null">competition_time = #{competitionTime},</if>
+            <if test="personnelLimit != null">personnel_limit = #{personnelLimit},</if>
+            <if test="competitionType != null">competition_type = #{competitionType},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysOfflineCompetitionById" parameterType="Long">
+        delete
+        from sys_competition_apply
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteSysOfflineCompetitionByIds" parameterType="String">
+        delete from sys_competition_apply where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
